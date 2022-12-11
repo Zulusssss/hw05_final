@@ -113,4 +113,4 @@ class PostURLTests(TestCase):
         Ошибка 404 использует корректный шаблон.
         '''
         response = self.guest_client.get('/bla-bla-bla/')
-        self.assertTemplateUsed(response.status_code, 'core/404.html')
+        self.assertTemplateUsed(response, 'core/404.html')
