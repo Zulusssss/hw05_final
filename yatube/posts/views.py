@@ -1,15 +1,14 @@
 from django.shortcuts import get_object_or_404, redirect, render
-#from django.views.decorators.cache import cache_page
 
 from .forms import CommentForm, PostForm
-from .models import Group, Post, User, Comment, Follow
+from .models import Group, Post, User, Follow
 from .utils import paginator
 from django.contrib.auth.decorators import login_required
 
 NUMBER_OF_POSTS = 10
 PAGE_POSTS_OF_USER = 2
 
-#@cache_page(20)
+
 def index(request):
     '''
     Позволяет перенести в HTML-код главной страницы сайта записи из
@@ -52,7 +51,8 @@ def profile(request, username):
     '''
     user = User.objects.get(username=username)
     post_list = user.posts.all()
-    queryset = Follow.objects.filter(user = request.user.pk, author = user.pk)
+    queryset = Follow.objects.filter(user=request.user.pk,
+                                     author=user.pk)
     following = len(queryset) != 0
     number_post_of_user = post_list.count()
     page_obj = paginator(request, post_list, PAGE_POSTS_OF_USER)
@@ -121,7 +121,8 @@ def post_edit(request, post_id):
     groups = Group.objects.all()
     if id_author == request.user:
         if request.method == 'POST':
-            form = PostForm(request.POST, files=request.FILES or None, instance=post)
+            form = PostForm(request.POST, files=request.FILES or None,
+                            instance=post)
 
             if form.is_valid():
                 form.save()
@@ -156,11 +157,12 @@ def follow_index(request):
     '''
     Создаёт страницу с постами авторов, на которых сделана подписка.
     '''
-    user = User.objects.get(pk = request.user.pk)
+    user = User.objects.get(pk=request.user.pk)
     set = []
     for i in user.follower.all():
         set.append(i.author)
-    post_list = Post.objects.select_related('author', 'group').filter(author__in=set)
+    post_list = Post.objects.select_related('author',
+                                            'group').filter(author__in=set)
     page_obj = paginator(request, post_list, NUMBER_OF_POSTS)
     template = 'posts/follow.html'
     title = 'Избранные авторы'
@@ -179,8 +181,8 @@ def profile_follow(request, username):
     if username == request.user.username:
         return redirect('posts:profile', username=username)
     user = User.objects.get(username=username)
-    if not Follow.objects.filter(user = request.user, author = user):
-        Follow.objects.create(user = request.user, author = user)
+    if not Follow.objects.filter(user=request.user, author=user):
+        Follow.objects.create(user=request.user, author=user)
     return redirect('posts:profile', username=username)
 
 
@@ -190,7 +192,5 @@ def profile_unfollow(request, username):
     Для отказа от подписки на автора.
     '''
     user = User.objects.get(username=username)
-    Follow.objects.filter(user = request.user, author = user).delete()
+    Follow.objects.filter(user=request.user, author=user).delete()
     return redirect('posts:profile', username=username)
-
-

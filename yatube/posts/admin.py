@@ -22,6 +22,7 @@ class GroupAdmin(admin.ModelAdmin):
     '''
     pass
 
+
 @admin.register(Follow)
 class FollowAdmin(admin.ModelAdmin):
     '''

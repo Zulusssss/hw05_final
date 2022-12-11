@@ -18,6 +18,7 @@ User = get_user_model()
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
 
+
 @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
 class PostTests(TestCase):
     @classmethod
@@ -29,13 +30,13 @@ class PostTests(TestCase):
             slug='test-slug',
             description='Тестовое описание',
         )
-        small_gif = (            
-             b'\x47\x49\x46\x38\x39\x61\x02\x00'
-             b'\x01\x00\x80\x00\x00\x00\x00\x00'
-             b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
-             b'\x00\x00\x00\x2C\x00\x00\x00\x00'
-             b'\x02\x00\x01\x00\x00\x02\x02\x0C'
-             b'\x0A\x00\x3B'
+        small_gif = (
+            b'\x47\x49\x46\x38\x39\x61\x02\x00'
+            b'\x01\x00\x80\x00\x00\x00\x00\x00'
+            b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
+            b'\x00\x00\x00\x2C\x00\x00\x00\x00'
+            b'\x02\x00\x01\x00\x00\x02\x02\x0C'
+            b'\x0A\x00\x3B'
         )
         uploaded = SimpleUploadedFile(
             name='small.gif',
@@ -47,7 +48,7 @@ class PostTests(TestCase):
             text='Тестовый пост',
             image=uploaded,
         )
-    
+
     @classmethod
     def tearDownClass(cls):
         super().tearDownClass()
@@ -119,13 +120,13 @@ class PaginatorViewsTest(TestCase):
             )
             cls.posts.append(obj)
             sleep(0.01)
-        small_gif = (            
-             b'\x47\x49\x46\x38\x39\x61\x02\x00'
-             b'\x01\x00\x80\x00\x00\x00\x00\x00'
-             b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
-             b'\x00\x00\x00\x2C\x00\x00\x00\x00'
-             b'\x02\x00\x01\x00\x00\x02\x02\x0C'
-             b'\x0A\x00\x3B'
+        small_gif = (
+            b'\x47\x49\x46\x38\x39\x61\x02\x00'
+            b'\x01\x00\x80\x00\x00\x00\x00\x00'
+            b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
+            b'\x00\x00\x00\x2C\x00\x00\x00\x00'
+            b'\x02\x00\x01\x00\x00\x02\x02\x0C'
+            b'\x0A\x00\x3B'
         )
         uploaded = SimpleUploadedFile(
             name='small.gif',
@@ -140,7 +141,7 @@ class PaginatorViewsTest(TestCase):
 
         self.authorized_client = Client()
         self.authorized_client.force_login(PaginatorViewsTest.user)
-    
+
     @classmethod
     def tearDownClass(cls):
         super().tearDownClass()
@@ -257,7 +258,7 @@ class CommentTest(TestCase):
         cls.guest_client = Client()
         cls.authorized_client = Client()
         cls.authorized_client.force_login(cls.user)
-    
+
     def test_authorized_user_can_comment(self):
         '''
         Авторизированный юзер может комментировать пост.
@@ -266,9 +267,10 @@ class CommentTest(TestCase):
         '''
         comments_count_1 = Comment.objects.count()
         form_data = {
-        'text': 'Тестовый текст комментария'
+            'text': 'Тестовый текст комментария'
         }
-        url = reverse('posts:add_comment', kwargs={'post_id': CommentTest.post.pk})
+        url = reverse('posts:add_comment',
+                      kwargs={'post_id': CommentTest.post.pk})
         response = self.authorized_client.post(
             url,
             data=form_data,
@@ -276,8 +278,9 @@ class CommentTest(TestCase):
         )
         comments_count_2 = Comment.objects.count()
         self.assertEqual(response.status_code, HTTPStatus.OK)
-        self.assertRedirects(response, reverse('posts:post_detail', kwargs={'post_id': CommentTest.post.pk}))
-        self.assertEqual(comments_count_1+1, comments_count_2)
+        self.assertRedirects(response, reverse('posts:post_detail',
+                             kwargs={'post_id': CommentTest.post.pk}))
+        self.assertEqual(comments_count_1 + 1, comments_count_2)
 
     def test_guest_user_NOT_can_comment(self):
         '''
@@ -287,9 +290,10 @@ class CommentTest(TestCase):
         '''
         comments_count_1 = Comment.objects.count()
         form_data = {
-        'text': 'Тестовый текст комментария'
+            'text': 'Тестовый текст комментария'
         }
-        url = reverse('posts:add_comment', kwargs={'post_id': CommentTest.post.pk})
+        url = reverse('posts:add_comment',
+                      kwargs={'post_id': CommentTest.post.pk})
         response = self.guest_client.post(
             url,
             data=form_data,
@@ -297,81 +301,87 @@ class CommentTest(TestCase):
         )
         comments_count_2 = Comment.objects.count()
         self.assertEqual(response.status_code, HTTPStatus.OK)
-        self.assertRedirects(response, reverse('users:login')+'?next='+url)
+        self.assertRedirects(response, reverse('users:login') + '?next=' + url)
         self.assertEqual(comments_count_1, comments_count_2)
-    
+
     def test_page_contains_new_comment(self):
         '''
         Новый комментарий отображается на странице.
         '''
         form_data = {
-        'text': 'Тестовый текст комментария'
+            'text': 'Тестовый текст комментария'
         }
-        url = reverse('posts:add_comment', kwargs={'post_id': CommentTest.post.pk})
+        url = reverse('posts:add_comment',
+                      kwargs={'post_id': CommentTest.post.pk})
         response = self.authorized_client.post(
             url,
             data=form_data,
             follow=True
         )
-        self.assertEqual(Comment.objects.get(pk=1), response.context['comments'][0])
+        self.assertEqual(Comment.objects.get(pk=1),
+                         response.context['comments'][0])
 
 
 class FollowingTest(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.user1 = User.objects.create(username = 'user1')
-        cls.user2 = User.objects.create(username = 'user2')
-        cls.user3 = User.objects.create(username = 'user3')
+        cls.user1 = User.objects.create(username='user1')
+        cls.user2 = User.objects.create(username='user2')
+        cls.user3 = User.objects.create(username='user3')
         cls.follow = Follow.objects.create(
-            user = cls.user1,
-            author = cls.user2,
+            user=cls.user1,
+            author=cls.user2,
         )
-    
+
     def setUp(self):
         super().setUp()
         self.user1_client = Client()
         self.user1_client.force_login(FollowingTest.user1)
-    
-    def  test_authorized_client_can_follow(self):
+
+    def test_authorized_client_can_follow(self):
         '''
         Авторизированный пользователь может подписаться на других
         пользователей.
         '''
-        url = reverse('posts:profile_follow', kwargs = {'username': FollowingTest.user3.username})
-        response = self.user1_client.get(url)
+        url = reverse('posts:profile_follow',
+                      kwargs={'username': FollowingTest.user3.username})
+        self.user1_client.get(url)
         self.assertTrue(
             Follow.objects.filter(
-                user = FollowingTest.user1,
-                author = FollowingTest.user3,
+                user=FollowingTest.user1,
+                author=FollowingTest.user3,
             ).exists()
         )
 
-    def  test_authorized_client_can_delete_follow(self):
+    def test_authorized_client_can_delete_follow(self):
         '''
         Авторизированный пользователь может удалять пользователей из
         своих подписок.
         '''
-        url = reverse('posts:profile_unfollow', kwargs = {'username': FollowingTest.user2.username})
-        response = self.user1_client.get(url)
+        url = reverse('posts:profile_unfollow',
+                      kwargs={'username': FollowingTest.user2.username})
+        self.user1_client.get(url)
         self.assertFalse(
             Follow.objects.filter(
-                user = FollowingTest.user1,
-                author = FollowingTest.user2,
+                user=FollowingTest.user1,
+                author=FollowingTest.user2,
             ).exists()
         )
-    
+
     def test_new_post_in_page_for_followers_and_not_followers(self):
         '''
         Новый пост есть на странице подписчика автора поста.
         Новый пост отсутствует на странице НЕподписчика автора поста.
         '''
-        Post.objects.create(text='Текст user2', author = FollowingTest.user2)
-        Post.objects.create(text='Текст user3', author = FollowingTest.user3)
+        Post.objects.create(text='Текст user2', author=FollowingTest.user2)
+        Post.objects.create(text='Текст user3', author=FollowingTest.user3)
         url = reverse('posts:follow_index')
         response = self.user1_client.get(url)
         for i in response.context['page_obj'].object_list:
             print(i)
         print(response.context['page_obj'].object_list)
-        self.assertIn(Post.objects.get(pk=1), response.context['page_obj'].object_list)
-        self.assertNotIn(Post.objects.get(pk=2), response.context['page_obj'].object_list)
+        self.assertIn(Post.objects.get(pk=1),
+                      response.context['page_obj'].object_list)
+        self.assertNotIn(Post.objects.get(pk=2),
+                         response.context['page_obj'].object_list)

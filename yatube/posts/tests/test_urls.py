@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model
-from django.http import Http404
 from django.test import TestCase, Client
 from http import HTTPStatus
 
@@ -108,9 +107,10 @@ class PostURLTests(TestCase):
         '''
         self.assertEqual(self.guest_client.get('/bla-bla-bla/').status_code,
                          HTTPStatus.NOT_FOUND)
-    
+
     def test_error_404_use_correct_template(self):
         '''
         Ошибка 404 использует корректный шаблон.
         '''
-        self.assertTemplateUsed(self.guest_client.get('/bla-bla-bla/').status_code, 'core/404.html')
+        response = self.guest_client.get('/bla-bla-bla/')
+        self.assertTemplateUsed(response.status_code, 'core/404.html')

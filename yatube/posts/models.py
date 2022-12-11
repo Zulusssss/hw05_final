@@ -47,8 +47,8 @@ class Post(models.Model):
     image = models.ImageField(
         'Картинка',
         upload_to='posts/',
-        blank=True
-    )  
+        blank=True,
+    )
 
     class Meta:
         ordering = ['-pub_date']
@@ -68,7 +68,7 @@ class Comment(models.Model):
         related_name='comments',
         verbose_name="Комментарий",
     )
-    author=models.ForeignKey(
+    author = models.ForeignKey(
         User,
         blank=True,
         null=True,
@@ -77,7 +77,8 @@ class Comment(models.Model):
         verbose_name="Комментарий",
     )
     text = models.TextField(verbose_name="Текст комментария")
-    created = models.DateTimeField(auto_now_add=True, verbose_name="Дата комментария")
+    created = models.DateTimeField(auto_now_add=True,
+                                   verbose_name="Дата комментария")
 
 
 class Follow(models.Model):

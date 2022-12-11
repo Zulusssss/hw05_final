@@ -3,9 +3,8 @@ from django.test import TestCase, Client
 
 from django.urls import reverse
 from ..models import Group, Post
-from ..views import NUMBER_OF_POSTS, PAGE_POSTS_OF_USER
 
-from django.utils.encoding import force_bytes, smart_str
+from django.utils.encoding import force_bytes
 
 User = get_user_model()
 
@@ -28,7 +27,7 @@ class CacheTest(TestCase):
             author=CacheTest.user,
             text='Тестовый пост',
         )
-    
+
     def test_deleted_post_save_in_cache(self):
         '''
         Пост сохраняется в кэше после удаления самого поста из БД.
