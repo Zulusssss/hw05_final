@@ -5,10 +5,13 @@ from .models import Group, Post, User, Follow
 from .utils import paginator
 from django.contrib.auth.decorators import login_required
 
+from django.views.decorators.cache import cache_page
+
 NUMBER_OF_POSTS = 10
 PAGE_POSTS_OF_USER = 2
 
 
+@cache_page(20)
 def index(request):
     '''
     Позволяет перенести в HTML-код главной страницы сайта записи из
@@ -157,10 +160,8 @@ def follow_index(request):
     '''
     Создаёт страницу с постами авторов, на которых сделана подписка.
     '''
-    user = User.objects.get(pk=request.user.pk)
-    set = []
-    for i in user.follower.all():
-        set.append(i.author)
+    set = User.objects.filter(following__in=Follow.objects.
+                              filter(user=request.user.pk))
     post_list = Post.objects.select_related('author',
                                             'group').filter(author__in=set)
     page_obj = paginator(request, post_list, NUMBER_OF_POSTS)
@@ -180,9 +181,8 @@ def profile_follow(request, username):
     '''
     if username == request.user.username:
         return redirect('posts:profile', username=username)
-    user = User.objects.get(username=username)
-    if not Follow.objects.filter(user=request.user, author=user):
-        Follow.objects.create(user=request.user, author=user)
+    user = get_object_or_404(User, username=username)
+    Follow.objects.get_or_create(user=request.user, author=user)
     return redirect('posts:profile', username=username)
 
 
@@ -191,6 +191,6 @@ def profile_unfollow(request, username):
     '''
     Для отказа от подписки на автора.
     '''
-    user = User.objects.get(username=username)
+    user = get_object_or_404(User, username=username)
     Follow.objects.filter(user=request.user, author=user).delete()
     return redirect('posts:profile', username=username)

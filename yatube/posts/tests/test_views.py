@@ -378,9 +378,6 @@ class FollowingTest(TestCase):
         Post.objects.create(text='Текст user3', author=FollowingTest.user3)
         url = reverse('posts:follow_index')
         response = self.user1_client.get(url)
-        for i in response.context['page_obj'].object_list:
-            print(i)
-        print(response.context['page_obj'].object_list)
         self.assertIn(Post.objects.get(pk=1),
                       response.context['page_obj'].object_list)
         self.assertNotIn(Post.objects.get(pk=2),

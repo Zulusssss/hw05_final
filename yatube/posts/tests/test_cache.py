@@ -4,7 +4,7 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from ..models import Group, Post
 
-from django.utils.encoding import force_bytes
+from django.core.cache import cache
 
 User = get_user_model()
 
@@ -32,7 +32,10 @@ class CacheTest(TestCase):
         '''
         Пост сохраняется в кэше после удаления самого поста из БД.
         '''
-        response = self.guest_client.get(reverse('posts:index'))
-        post = Post.objects.get(pk=1)
+        response_1 = self.guest_client.get(reverse('posts:index'))
         Post.objects.get(pk=1).delete()
-        self.assertIn(force_bytes(post), response.content)
+        response_2 = self.guest_client.get(reverse('posts:index'))
+        self.assertEqual(response_1.content, response_2.content)
+        cache.clear()
+        response_3 = self.guest_client.get(reverse('posts:index'))
+        self.assertNotEqual(response_1.content, response_3.content)

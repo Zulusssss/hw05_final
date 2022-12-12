@@ -2,6 +2,8 @@ from django.db import models
 
 from django.contrib.auth import get_user_model
 
+from django.db.models.constraints import UniqueConstraint
+
 NUMBER_OF_CHAR = 15
 
 User = get_user_model()
@@ -94,3 +96,8 @@ class Follow(models.Model):
         related_name='following',
         verbose_name='Автор',
     )
+    
+    class Meta:
+        constraints =[
+            UniqueConstraint(fields=['user', 'author'], name='user_and_author')
+        ]
