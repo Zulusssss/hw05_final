@@ -13,6 +13,7 @@ from ..forms import PostForm
 from ..models import Comment, Group, Post, Follow
 from ..utils import paginator
 from ..views import NUMBER_OF_POSTS, PAGE_POSTS_OF_USER
+from django.core.cache import cache
 
 User = get_user_model()
 
@@ -146,6 +147,10 @@ class PaginatorViewsTest(TestCase):
     def tearDownClass(cls):
         super().tearDownClass()
         shutil.rmtree(TEMP_MEDIA_ROOT, ignore_errors=True)
+
+    def tearDown(self):
+        super().tearDown()
+        cache.clear()
 
     def test_first_page_contains_ten_records(self):
         '''

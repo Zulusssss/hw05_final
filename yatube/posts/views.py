@@ -5,13 +5,10 @@ from .models import Group, Post, User, Follow
 from .utils import paginator
 from django.contrib.auth.decorators import login_required
 
-from django.views.decorators.cache import cache_page
-
 NUMBER_OF_POSTS = 10
 PAGE_POSTS_OF_USER = 2
 
 
-@cache_page(20)
 def index(request):
     '''
     Позволяет перенести в HTML-код главной страницы сайта записи из
