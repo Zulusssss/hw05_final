@@ -5,7 +5,6 @@
 - Python 3.9.10
 - Django 2.2.16
 - SQLite3
--
 
 ## Description
 
@@ -40,6 +39,13 @@ brew link python@3.9.10
 ```text
 python manage.py makemigrations
 python manage.py migrate
+```
+
+- Fill in the env-file like it
+
+```text
+SECRET_KEY=<Your_some_long_string>
+DEBUG=False
 ```
 
 - Run the project
